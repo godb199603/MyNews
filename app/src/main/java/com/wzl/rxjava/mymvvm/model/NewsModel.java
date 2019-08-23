@@ -12,6 +12,16 @@ public class NewsModel implements IModelType{
     private String title;
     private String image;
     private int newsId;
+    private String date;
+    public String getDate() {
+        return date;
+    }
+
+    public void setDate(String date) {
+        this.date = date;
+    }
+
+
     public int getNewsId() {
         return newsId;
     }

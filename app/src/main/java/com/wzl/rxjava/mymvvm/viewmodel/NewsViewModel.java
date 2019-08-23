@@ -21,6 +21,7 @@ import com.wzl.rxjava.mymvvm.repository.NewsRepository;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import io.reactivex.Observer;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -51,20 +52,21 @@ public class NewsViewModel extends ViewModel{
     private NewsDateModel newsDateModel;
 //    private NewsModel newsModel=new NewsModel();
     private NewsModel newsModel;
-    private List<NewsModel> newsModelList = new ArrayList<NewsModel>();
+    private static List<NewsModel> newsModelList = new ArrayList<NewsModel>();
+    private static List<NewsDateModel> newsDateModelList = new ArrayList<NewsDateModel>();
     private int newsId;
     public static final String DATE="20190817";
     public static final String DATE2="20190816";
 
-
+    static List<NewsModel> newsModelList2 = new ArrayList<NewsModel>();
 
     public void loadData(){
         getNewsDate();
         getNews();
-        getBeforeNewsDate(DATE);
-        getBeforeNews(DATE);
-        getBeforeNewsDate(DATE2);
-        getBeforeNews(DATE2);
+        getBeforeNewsDate("20190817");
+        getBeforeNews("20190817");
+//        getBeforeNewsDate(DATE2);
+//        getBeforeNews(DATE2);
 //        initListener();
 
     }
@@ -81,7 +83,7 @@ public class NewsViewModel extends ViewModel{
                     @Override
                     public List<IModelType> apply(NewsListBean bean) {
                         return convert1(bean);}
-                }) .subscribeOn(Schedulers.io())
+                }) .subscribeOn(Schedulers.io()).delay(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<IModelType>>() {
                     public void onSubscribe(Disposable disposable) {}
@@ -104,14 +106,14 @@ public class NewsViewModel extends ViewModel{
     public void getNews() {
         NewsRepository newsRepository2= new NewsRepository(Retrofit2Helper.createretrofit().create(NewsApi.class));
         NewsApi newsApi=Retrofit2Helper.createretrofit().create(NewsApi.class);
-        Log.i("hHH",newsData.toString());
+        Log.i("jiaru",newsData.toString());
         newsApi.getLatestNews().
 //        newsRepository2.getLatestNews().
                 map(new Function<NewsListBean, List<IModelType>>() {
                     @Override
                     public List<IModelType> apply(NewsListBean bean) {
                         return convert2(bean);}
-                }).subscribeOn(Schedulers.io())
+                }).subscribeOn(Schedulers.io()).delay(1, TimeUnit.SECONDS)
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribe(new Observer<List<IModelType>>() {
                     public void onSubscribe(Disposable disposable) {}
@@ -135,7 +137,7 @@ public class NewsViewModel extends ViewModel{
     public void getBeforeNewsDate(String date) {
 
         NewsApi newsApi=Retrofit2Helper.createretrofit().create(NewsApi.class);
-        Log.i("hHH",newsData.toString());
+        Log.i("jiaru",newsData.toString());
         newsApi.getBeforeNews(date).
 //        newsRepository2.getLatestNews().
         map(new Function<NewsListBean, List<IModelType>>() {
@@ -164,7 +166,7 @@ public class NewsViewModel extends ViewModel{
     public void getBeforeNews(String date) {
         NewsRepository newsRepository2= new NewsRepository(Retrofit2Helper.createretrofit().create(NewsApi.class));
         NewsApi newsApi=Retrofit2Helper.createretrofit().create(NewsApi.class);
-        Log.i("hHH",newsData.toString());
+        Log.i("加入",newsData.toString());
         newsApi.getBeforeNews(date).
 //        newsRepository2.getLatestNews().
         map(new Function<NewsListBean, List<IModelType>>() {
@@ -179,6 +181,7 @@ public class NewsViewModel extends ViewModel{
 
                         newsData.setValue(list);
                         Log.i("hHHLLL",newsData.toString());
+
 
                     }
                     public void onError(Throwable e) {
@@ -202,12 +205,16 @@ public class NewsViewModel extends ViewModel{
             newsModel.setTitle(bean.getTitle());
             newsModel.setImage(bean.getImages().get(0));
             newsModel.setNewsId(bean.getId());
+            newsModel.setDate(list.getDate());
 //            list2.addAll(assembleData());
 //            newsModelList.add(newsModel);
-            Log.i("hHHKKKK",newsData.toString());
+            Log.i("newsData",newsData.toString());
+            Log.i("YYYY",newsModel.getDate());
             newsModelList.add(newsModel);
+            Log.i("newsModelList",newsModelList.toString());
+
         }
-//        newsModelList.add(newsModel);
+
         return assembleData();
     }//方法结束
 
@@ -216,23 +223,15 @@ public class NewsViewModel extends ViewModel{
 
     //返回日期bean->model->list
     public List<IModelType> convert1(NewsListBean list) {
-
-        newsDateModel = new NewsDateModel();
-        newsDateModel.setDate(list.getDate());
-
+            newsDateModel = new NewsDateModel();
+            newsDateModel.setDate(list.getDate());
+            newsDateModelList.add(newsDateModel);
+        Log.i("DDDDDATE",newsDateModel.getDate());
+        Log.i("DDDDDATE",newsDateModelList.toString());
         return assembleData();
     }//方法结束
 
-//
-//    //返回日期bean->model->list
-//    public List<IModelType> convert3(NewsListBean list) {
-//
-//        newsDateModel = new NewsDateModel();
-//        newsDateModel.setDate(list.getDate());
-//
-//        return assembleData();
-//    }//方法结束
-//
+
 
 
 
@@ -240,13 +239,40 @@ public class NewsViewModel extends ViewModel{
     /**
      * 组装数据列表。
      */
-    private List<IModelType> assembleData(){
-          List<IModelType> list =new ArrayList<IModelType>();
-         list.add(newsDateModel);
+    private List<IModelType> assembleData() {
+        List<IModelType> list = new ArrayList<IModelType>();
+//        List<NewsModel> newsModelList2 = new ArrayList<NewsModel>();
+//        List<IModelType> list2 = new ArrayList<IModelType>();
+//         list.add(newsDateModel);
 //         list.add(newsModel);
-         list.addAll(newsModelList);
-         return list;
-        }
+//        list.addAll(newsDateModelList);
+//        list.addAll(newsModelList);
+
+        for (NewsDateModel newsDateModel : newsDateModelList) {
+                list.add(newsDateModel);
+            Log.i("FFFFFH",newsDateModel.getDate());
+            for(NewsModel newsModel:newsModelList){
+                Boolean a=newsDateModel.getDate().equals(newsModel.getDate());
+                Log.i("是否相等",a.toString());
+               if(newsDateModel.getDate().equals(newsModel.getDate())){
+
+                   Log.i("FFFFF",a.toString());
+                   Log.i("FFFFF",newsDateModel.getDate()+"DDD");
+                   Log.i("FFFFF",newsModel.getDate());
+                   Log.i("FFFFF",newsModel.getTitle());
+                newsModelList2.add(newsModel);
+                   Log.i("FFFFFgggg",newsModelList2.toString());
+                }//if语句结束
+
+            }//fornewsmodel结束
+
+            list.addAll(newsModelList2);
+            Log.i("SIZE",list.size()+"");
+
+        }//fordate
+        return list;
+
+        }//组装方法结束
 
 
-    }
+    }//总的结束

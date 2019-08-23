@@ -8,4 +8,6 @@ package com.wzl.rxjava.mymvvm.base;
 public interface ModelType {
 
    public int getViewType();
+//   public int getChildViewType();
+
 }

@@ -32,7 +32,7 @@ public class NewsDetailViewModel extends ViewModel{
     public ObservableField<String> headerimage=new ObservableField<String>();
     public ObservableField<String> headertitle=new ObservableField<String>();
     public ObservableField<String> headersource=new ObservableField<String>();
-   public ObservableField<String> htmlData=new ObservableField<String>();
+    public ObservableField<String> htmlData=new ObservableField<String>();
     public void loadData(int id) {
         getNewsDetail(id);
     }

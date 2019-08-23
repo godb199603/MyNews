@@ -31,6 +31,7 @@ public abstract class BaseAdapter<M extends ModelType> extends RecyclerView.Adap
 
     @Override
     public int getItemViewType(int position){
+        
         return items.get(position).getViewType();
     }
 
